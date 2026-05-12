@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AOLCC | Random Arrays &amp; Advanced Lookups Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Raleway:wght@600;700;800&display=swap" rel="stylesheet" />
+<style>
+  /* ── Reset & Tokens ────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green-primary:   #48A548;
+    --green-secondary: #A9CA3F;
+    --green-dark:      #357a35;
+    --green-light:     #edf7ed;
+    --bg:              #f5f5f7;
+    --surface:         #ffffff;
+    --text-dark:       #1b1b1f;
+    --text-mid:        #4a4a52;
+    --text-light:      #7a7a85;
+    --border:          #dde0e6;
+    --correct:         #48A548;
+    --wrong:           #e53935;
+    --shadow-sm:       0 2px 8px rgba(0,0,0,.07);
+    --shadow-md:       0 6px 24px rgba(0,0,0,.11);
+    --radius:          12px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Lato', sans-serif;
+    background: var(--bg);
+    color: var(--text-dark);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Top Bar ───────────────────────────────────────────── */
+  .topbar {
+    background: var(--surface);
+    border-bottom: 3px solid var(--green-primary);
+    padding: .7rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: .85rem;
+    box-shadow: var(--shadow-sm);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo-badge {
+    width: 38px; height: 38px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--green-primary), var(--green-secondary));
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .logo-badge svg { width: 20px; height: 20px; fill: #fff; }
+
+  .logo-text .org {
+    font-family: 'Raleway', sans-serif;
+    font-weight: 800; font-size: .75rem;
+    letter-spacing: .05em; text-transform: uppercase;
+    color: var(--green-dark); display: block;
+  }
+  .logo-text .sub { font-size: .66rem; color: var(--text-light); display: block; }
+
+  .topbar-badge {
+    margin-left: auto;
+    background: var(--green-light);
+    color: var(--green-dark);
+    font-family: 'Raleway', sans-serif;
+    font-weight: 700; font-size: .72rem;
+    letter-spacing: .04em;
+    padding: .28rem .75rem;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  /* ── Hero Banner ───────────────────────────────────────── */
+  .hero {
+    background: linear-gradient(118deg, var(--green-dark) 0%, var(--green-primary) 55%, var(--green-secondary) 100%);
+    padding: 2rem 1.5rem 1.6rem;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='52' height='52' viewBox='0 0 52 52' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.045'%3E%3Ccircle cx='26' cy='26' r='4'/%3E%3Ccircle cx='2' cy='2' r='2'/%3E%3Ccircle cx='50' cy='2' r='2'/%3E%3Ccircle cx='2' cy='50' r='2'/%3E%3Ccircle cx='50' cy='50' r='2'/%3E%3C/g%3E%3C/svg%3E") repeat;
+    pointer-events: none;
+  }
+  .hero-inner { position: relative; max-width: 740px; margin: 0 auto; }
+
+  .hero-eyebrow {
+    font-size: .72rem; letter-spacing: .08em; text-transform: uppercase;
+    opacity: .75; margin-bottom: .5rem;
+  }
+  .hero h1 {
+    font-family: 'Raleway', sans-serif;
+    font-weight: 800;
+    font-size: clamp(1.3rem, 3.5vw, 1.85rem);
+    line-height: 1.2; letter-spacing: -.01em;
+    margin-bottom: .45rem;
+  }
+  .hero p { font-size: .875rem; opacity: .88; line-height: 1.55; max-width: 520px; }
+
+  .hero-pills { display: flex; flex-wrap: wrap; gap: .45rem; margin-top: .9rem; }
+  .hero-pill {
+    background: rgba(255,255,255,.16);
+    border: 1px solid rgba(255,255,255,.28);
+    color: #fff; font-size: .68rem; font-weight: 700;
+    letter-spacing: .06em; text-transform: uppercase;
+    padding: .22rem .65rem; border-radius: 20px;
+  }
+
+  /* ── Main Wrapper ──────────────────────────────────────── */
+  .main {
+    flex: 1;
+    max-width: 740px; width: 100%;
+    margin: 0 auto;
+    padding: 1.75rem 1.25rem 3rem;
+  }
+
+  /* ── Progress ──────────────────────────────────────────── */
+  .progress-wrap {
+    display: flex; align-items: center; gap: .85rem;
+    margin-bottom: 1.5rem;
+  }
+  .progress-track {
+    flex: 1; height: 6px;
+    background: var(--border); border-radius: 99px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--green-primary), var(--green-secondary));
+    border-radius: 99px;
+    transition: width .45s ease;
+    width: 0%;
+  }
+  .progress-lbl {
+    font-family: 'Raleway', sans-serif;
+    font-weight: 700; font-size: .78rem;
+    color: var(--text-mid); white-space: nowrap;
+  }
+
+  /* ── Question Card ─────────────────────────────────────── */
+  .q-card {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    margin-bottom: 1.25rem;
+    display: none;
+    animation: cardIn .35s ease;
+  }
+  .q-card.active { display: block; }
+
+  @keyframes cardIn {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* card header stripe */
+  .q-card-header {
+    background: linear-gradient(90deg, var(--green-primary), var(--green-dark));
+    padding: .7rem 1.25rem;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .q-type-tag {
+    font-family: 'Raleway', sans-serif;
+    font-weight: 700; font-size: .68rem;
+    letter-spacing: .1em; text-transform: uppercase;
+    color: rgba(255,255,255,.82);
+    background: rgba(255,255,255,.14);
+    border: 1px solid rgba(255,255,255,.22);
+    padding: .22rem .65rem; border-radius: 20px;
+  }
+  .q-number {
+    font-family: 'Raleway', sans-serif;
+    font-weight: 800; font-size: .75rem;
+    color: rgba(255,255,255,.65);
+  }
+
+  /* card body */
+  .q-body { padding: 1.6rem 1.5rem 1.25rem; }
+
+  /* scenario box */
+  .scenario {
+    background: var(--green-light);
+    border-left: 3px solid var(--green-primary);
+    border-radius: 0 8px 8px 0;
+    padding: .75rem 1rem;
+    margin-bottom: 1.1rem;
+    font-family: 'Courier New', monospace;
+    font-size: .83rem;
+    color: var(--text-mid);
+    line-height: 1.6;
+  }
+
+  h2.q-text {
+    font-family: 'Raleway', sans-serif;
+    font-weight: 700;
+    font-size: clamp(.95rem, 2.4vw, 1.08rem);
+    color: var(--text-dark);
+    line-height: 1.5;
+    margin-bottom: 1.2rem;
+  }
+
+  /* ── MCQ Options ───────────────────────────────────────── */
+  .options { display: flex; flex-direction: column; gap: .55rem; }
+
+  .opt-btn {
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    color: var(--text-dark);
+    border-radius: 9px;
+    padding: .8rem 1rem;
+    cursor: pointer;
+    font-family: 'Lato', sans-serif;
+    font-size: .9rem;
+    text-align: left;
+    display: flex; align-items: flex-start; gap: .75rem;
+    transition: border-color .17s, background .17s;
+  }
+  .opt-btn:hover:not(:disabled) {
+    border-color: var(--green-primary);
+    background: var(--green-light);
+  }
+  .opt-btn:focus-visible { outline: 3px solid var(--green-secondary); outline-offset: 2px; }
+
+  .opt-lbl {
+    min-width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Raleway', sans-serif;
+    font-weight: 700; font-size: .7rem;
+    flex-shrink: 0; margin-top: 1px;
+    transition: background .17s, color .17s;
+  }
+
+  .opt-btn.is-correct {
+    border-color: var(--correct);
+    background: #edf7ed;
+  }
+  .opt-btn.is-correct .opt-lbl { background: var(--correct); color: #fff; }
+
+  .opt-btn.is-wrong {
+    border-color: var(--wrong);
+    background: #fdecea;
+  }
+  .opt-btn.is-wrong .opt-lbl { background: var(--wrong); color: #fff; }
+  .opt-btn:disabled { cursor: not-allowed; }
+
+  /* ── Match Question ────────────────────────────────────── */
+  .match-hint {
+    font-size: .78rem; color: var(--text-light);
+    margin-bottom: .75rem;
+    font-style: italic;
+  }
+  .match-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: .85rem;
+  }
+  .match-col-lbl {
+    font-family: 'Raleway', sans-serif;
+    font-weight: 700; font-size: .7rem;
+    text-transform: uppercase; letter-spacing: .08em;
+    color: var(--text-light); margin-bottom: .4rem;
+  }
+  .match-col { display: flex; flex-direction: column; gap: .45rem; }
+
+  .m-item {
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: .7rem .85rem;
+    font-size: .84rem;
+    cursor: pointer;
+    transition: border-color .17s, background .17s;
+    user-select: none;
+    min-height: 50px;
+    display: flex; align-items: center;
+    line-height: 1.35;
+  }
+  .m-item.left-item  { border-left: 3px solid var(--green-secondary); }
+  .m-item.right-item { border-left: 3px solid var(--green-primary); }
+  .m-item.selected   { border-color: var(--green-primary); background: var(--green-light); }
+  .m-item.m-correct  { border-color: var(--correct); background: #edf7ed; opacity: .8; cursor: default; }
+  .m-item.m-wrong    { border-color: var(--wrong); background: #fdecea; }
+  .m-item:focus-visible { outline: 3px solid var(--green-secondary); outline-offset: 2px; }
+
+  /* ── Arrange Question ──────────────────────────────────── */
+  .arrange-hint {
+    font-size: .78rem; color: var(--text-light);
+    margin-bottom: .75rem; font-style: italic;
+  }
+  .arrange-list { display: flex; flex-direction: column; gap: .45rem; margin-bottom: 1rem; }
+
+  .arr-item {
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: .75rem 1rem;
+    font-size: .875rem;
+    cursor: grab;
+    display: flex; align-items: center; gap: .7rem;
+    transition: border-color .15s, background .15s;
+    user-select: none;
+  }
+  .arr-item:active { cursor: grabbing; }
+  .arr-item.dragging  { opacity: .35; border-style: dashed; }
+  .arr-item.drag-over { border-color: var(--green-primary); background: var(--green-light); transform: scale(1.01); }
+  .arr-item.arr-ok    { border-color: var(--correct); background: #edf7ed; }
+  .arr-item.arr-bad   { border-color: var(--wrong);   background: #fdecea; }
+
+  .drag-handle { color: var(--text-light); font-size: 1rem; flex-shrink: 0; }
+  .step-n { font-family: 'Raleway', sans-serif; font-weight: 700; font-size: .72rem; color: var(--text-light); min-width: 20px; }
+
+  /* ── Feedback Box ──────────────────────────────────────── */
+  .feedback {
+    margin-top: 1rem;
+    padding: .85rem 1.1rem;
+    border-radius: 9px;
+    font-size: .85rem; line-height: 1.55;
+    display: none;
+  }
+  .feedback.show { display: block; animation: fadeIn .25s ease; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .feedback.fb-ok  { background: #edf7ed; border: 1px solid #a5d6a7; color: #1b5e20; }
+  .feedback.fb-err { background: #fdecea; border: 1px solid #ef9a9a; color: #7f0000; }
+  .feedback strong { display: block; margin-bottom: .25rem; font-size: .88rem; }
+
+  /* ── Card Footer / Buttons ─────────────────────────────── */
+  .q-footer {
+    padding: 1rem 1.5rem 1.25rem;
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center; gap: .7rem; flex-wrap: wrap;
+  }
+
+  .btn {
+    font-family: 'Raleway', sans-serif;
+    font-weight: 700; font-size: .82rem;
+    letter-spacing: .03em;
+    border: none; border-radius: 8px;
+    cursor: pointer;
+    display: inline-flex; align-items: center; gap: .4rem;
+    padding: .65rem 1.25rem;
+    transition: background .17s, transform .1s, box-shadow .17s;
+    line-height: 1;
+  }
+  .btn:active { transform: scale(.97); }
+  .btn:focus-visible { outline: 3px solid var(--green-secondary); outline-offset: 2px; }
+  .btn:disabled { opacity: .35; cursor: not-allowed; transform: none !important; }
+
+  .btn-primary {
+    background: var(--green-primary); color: #fff;
+    box-shadow: 0 4px 12px rgba(72,165,72,.3);
+  }
+  .btn-primary:hover:not(:disabled) {
+    background: var(--green-dark);
+    box-shadow: 0 6px 16px rgba(72,165,72,.4);
+  }
+
+  .btn-outline {
+    background: var(--surface); color: var(--text-mid);
+    border: 1.5px solid var(--border);
+    box-shadow: var(--shadow-sm);
+  }
+  .btn-outline:hover:not(:disabled) {
+    border-color: var(--green-primary);
+    color: var(--green-dark);
+    background: var(--green-light);
+  }
+
+  /* ── Results Screen ────────────────────────────────────── */
+  #results {
+    display: none;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    padding: 2.5rem 2rem;
+    text-align: center;
+    animation: cardIn .4s ease;
+  }
+
+  .score-ring-wrap {
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: conic-gradient(var(--green-primary) var(--ring-pct, 0%), var(--border) 0%);
+    display: flex; align-items: center; justify-content: center;
+    margin: 1.25rem auto;
+    position: relative;
+  }
+  .score-ring-wrap::after {
+    content: '';
+    position: absolute; inset: 11px;
+    background: var(--surface); border-radius: 50%;
+  }
+  .score-ring-inner {
+    font-family: 'Raleway', sans-serif;
+    font-weight: 800; font-size: 1.7rem;
+    color: var(--text-dark);
+    position: relative; z-index: 1;
+  }
+
+  #results h2 {
+    font-family: 'Raleway', sans-serif;
+    font-weight: 800; font-size: 1.35rem;
+    color: var(--text-dark); margin-bottom: .4rem;
+  }
+  #results p {
+    font-size: .88rem; color: var(--text-mid);
+    line-height: 1.55; max-width: 420px; margin: 0 auto 1.5rem;
+  }
+
+  /* ── Footer ────────────────────────────────────────────── */
+  footer {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: .85rem 1.5rem;
+    text-align: center;
+    font-size: .72rem;
+    color: var(--text-light);
+  }
+  footer span { color: var(--green-primary); font-weight: 700; }
+
+  /* ── Responsive ────────────────────────────────────────── */
+  @media (max-width: 540px) {
+    .match-grid { grid-template-columns: 1fr; }
+    .q-body { padding: 1.25rem 1rem 1rem; }
+    .q-footer { padding: .85rem 1rem 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Top Bar ─────────────────────────────────────────── -->
+<header class="topbar">
+  <div class="logo-badge" aria-hidden="true">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+    </svg>
+  </div>
+  <div class="logo-text">
+    <span class="org">AOLCC</span>
+    <span class="sub">Academy of Learning Career College</span>
+  </div>
+  <div class="topbar-badge">Module E · Excel</div>
+</header>
+
+<!-- ── Hero ───────────────────────────────────────────── -->
+<section class="hero" aria-label="Module introduction">
+  <div class="hero-inner">
+    <p class="hero-eyebrow">Excel Skills · Module E</p>
+    <h1>Random Arrays &amp; Advanced Lookups</h1>
+    <p>Test your knowledge of RANDARRAY, RANDBETWEEN, XLOOKUP, and XMATCH with 3 targeted questions.</p>
+    <div class="hero-pills">
+      <span class="hero-pill">RANDARRAY</span>
+      <span class="hero-pill">XLOOKUP</span>
+      <span class="hero-pill">XMATCH</span>
+      <span class="hero-pill">3 Questions</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── Main ───────────────────────────────────────────── -->
+<main class="main" id="quiz-area">
+
+  <!-- Progress -->
+  <div class="progress-wrap" aria-label="Quiz progress">
+    <div class="progress-track" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="3" aria-label="Progress">
+      <div class="progress-fill" id="prog-fill"></div>
+    </div>
+    <div class="progress-lbl" id="prog-lbl">0 / 3</div>
+  </div>
+
+  <!-- ══ Q1 — Multiple Choice ══ -->
+  <article class="q-card active" id="q1" aria-label="Question 1">
+    <div class="q-card-header">
+      <span class="q-type-tag">Multiple Choice</span>
+      <span class="q-number">Q1 of 3</span>
+    </div>
+    <div class="q-body">
+      <h2 class="q-text">You need to fill a 4×3 grid with random decimal numbers between 1 and 100. Which formula accomplishes this in a single cell using a dynamic spill range?</h2>
+      <div class="options" role="list">
+        <button class="opt-btn" role="listitem" onclick="checkMCQ(this,'q1',false)" aria-label="Option A">
+          <span class="opt-lbl" aria-hidden="true">A</span>
+          =RANDBETWEEN(1,100) copied 12 times
+        </button>
+        <button class="opt-btn" role="listitem" onclick="checkMCQ(this,'q1',true)" aria-label="Option B">
+          <span class="opt-lbl" aria-hidden="true">B</span>
+          =RANDARRAY(4,3,1,100)
+        </button>
+        <button class="opt-btn" role="listitem" onclick="checkMCQ(this,'q1',false)" aria-label="Option C">
+          <span class="opt-lbl" aria-hidden="true">C</span>
+          =RANDARRAY(4,3) * 100
+        </button>
+        <button class="opt-btn" role="listitem" onclick="checkMCQ(this,'q1',false)" aria-label="Option D">
+          <span class="opt-lbl" aria-hidden="true">D</span>
+          =RANDBETWEEN(RANDARRAY(4,3),100)
+        </button>
+      </div>
+      <div class="feedback" id="q1-fb" role="alert" aria-live="polite"></div>
+    </div>
+    <div class="q-footer">
+      <button class="btn btn-primary" id="q1-next" onclick="goNext(1)" disabled aria-label="Next question">Next &rarr;</button>
+    </div>
+  </article>
+
+  <!-- ══ Q2 — Match the Pairs ══ -->
+  <article class="q-card" id="q2" aria-label="Question 2">
+    <div class="q-card-header">
+      <span class="q-type-tag">Match the Pairs</span>
+      <span class="q-number">Q2 of 3</span>
+    </div>
+    <div class="q-body">
+      <h2 class="q-text">Match each XLOOKUP argument to its correct description.</h2>
+      <p class="match-hint">Click a left-column item, then click its match on the right.</p>
+      <div class="match-grid">
+        <!-- Left -->
+        <div class="match-col">
+          <p class="match-col-lbl">XLOOKUP Argument</p>
+          <div class="m-item left-item" id="ml1" tabindex="0" role="button" aria-label="lookup_value" onclick="matchClick('ml1')">lookup_value</div>
+          <div class="m-item left-item" id="ml2" tabindex="0" role="button" aria-label="return_array" onclick="matchClick('ml2')">return_array</div>
+          <div class="m-item left-item" id="ml3" tabindex="0" role="button" aria-label="if_not_found" onclick="matchClick('ml3')">if_not_found</div>
+          <div class="m-item left-item" id="ml4" tabindex="0" role="button" aria-label="match_mode" onclick="matchClick('ml4')">match_mode</div>
+        </div>
+        <!-- Right -->
+        <div class="match-col">
+          <p class="match-col-lbl">Description</p>
+          <div class="m-item right-item" id="mr1" tabindex="0" role="button" aria-label="Custom text shown when no match exists" onclick="matchClick('mr1')">Custom text shown when no match exists</div>
+          <div class="m-item right-item" id="mr2" tabindex="0" role="button" aria-label="The value you are searching for" onclick="matchClick('mr2')">The value you are searching for</div>
+          <div class="m-item right-item" id="mr3" tabindex="0" role="button" aria-label="Controls exact, wildcard, or approximate matching" onclick="matchClick('mr3')">Controls exact, wildcard, or approximate matching</div>
+          <div class="m-item right-item" id="mr4" tabindex="0" role="button" aria-label="The column(s) from which to return results" onclick="matchClick('mr4')">The column(s) from which to return results</div>
+        </div>
+      </div>
+      <div class="feedback" id="q2-fb" role="alert" aria-live="polite"></div>
+    </div>
+    <div class="q-footer">
+      <button class="btn btn-primary" id="q2-next" onclick="goNext(2)" disabled aria-label="Next question">Next &rarr;</button>
+    </div>
+  </article>
+
+  <!-- ══ Q3 — Arrange in Order ══ -->
+  <article class="q-card" id="q3" aria-label="Question 3">
+    <div class="q-card-header">
+      <span class="q-type-tag">Arrange in Order</span>
+      <span class="q-number">Q3 of 3</span>
+    </div>
+    <div class="q-body">
+      <h2 class="q-text">Drag the steps into the correct order to build a two-way lookup using nested XLOOKUP.</h2>
+      <p class="arrange-hint">Drag and drop each step into the right sequence, then click Check Order.</p>
+      <div class="arrange-list" id="arr-list" aria-label="Sortable steps">
+        <div class="arr-item" draggable="true" data-order="3" tabindex="0" aria-label="Step: Nest a second XLOOKUP as the return_array to match the column header">
+          <span class="drag-handle" aria-hidden="true">⠿</span>
+          <span class="step-n"></span>
+          Nest a second XLOOKUP as the return_array to match the column header
+        </div>
+        <div class="arr-item" draggable="true" data-order="1" tabindex="0" aria-label="Step: Identify the row lookup value">
+          <span class="drag-handle" aria-hidden="true">⠿</span>
+          <span class="step-n"></span>
+          Identify the row lookup value (e.g., a product name)
+        </div>
+        <div class="arr-item" draggable="true" data-order="4" tabindex="0" aria-label="Step: Verify the formula returns the correct intersection value">
+          <span class="drag-handle" aria-hidden="true">⠿</span>
+          <span class="step-n"></span>
+          Run the formula and verify it returns the correct intersection value
+        </div>
+        <div class="arr-item" draggable="true" data-order="2" tabindex="0" aria-label="Step: Write the outer XLOOKUP searching the row headers">
+          <span class="drag-handle" aria-hidden="true">⠿</span>
+          <span class="step-n"></span>
+          Write the outer XLOOKUP searching the row headers with the row lookup value
+        </div>
+      </div>
+      <div class="feedback" id="q3-fb" role="alert" aria-live="polite"></div>
+    </div>
+    <div class="q-footer">
+      <button class="btn btn-outline" onclick="checkArrange()" aria-label="Check order">Check Order</button>
+      <button class="btn btn-primary" id="q3-next" onclick="showResults()" disabled aria-label="See results">See Results &rarr;</button>
+    </div>
+  </article>
+
+  <!-- ══ Results ══ -->
+  <section id="results" aria-label="Quiz results" aria-live="polite">
+    <div class="score-ring-wrap" id="ring" aria-hidden="true">
+      <span class="score-ring-inner" id="ring-num">0/3</span>
+    </div>
+    <h2 id="res-title">Well done!</h2>
+    <p id="res-body">Keep reviewing the key concepts to strengthen your Excel skills.</p>
+    <button class="btn btn-primary" onclick="restartQuiz()" aria-label="Retake quiz">&#8635; Retake Quiz</button>
+  </section>
+
+</main>
+
+<!-- ── Footer ─────────────────────────────────────────── -->
+<footer>
+  &copy; 2025 <span>Academy of Learning Career College</span> &mdash; Module E: Random Arrays &amp; Advanced Lookups
+</footer>
+
+<script>
+  /* ════════════════════════════════════════════
+     STATE
+  ════════════════════════════════════════════ */
+  var score       = 0;
+  var answered    = { q1: false, q2: false, q3: false };
+  var matchSel    = null;          // currently selected match item id
+  var matchCount  = 0;             // correct pairs matched so far
+  var arrChecked  = false;         // arrange already checked correctly
+
+  /* correct match pairs: left-id → right-id */
+  var PAIRS = { ml1: 'mr2', ml2: 'mr4', ml3: 'mr1', ml4: 'mr3' };
+
+  /* arrange correct order */
+  var ARR_CORRECT = [1, 2, 3, 4];
+
+  /* feedback copy */
+  var FB = {
+    q1: {
+      ok:  '<strong>✓ Correct!</strong> <code>=RANDARRAY(rows, cols, min, max)</code> fills a grid with random values in one spill formula. Here, RANDARRAY(4,3,1,100) produces a 4-row × 3-column block of random numbers from 1 to 100.',
+      err: '<strong>✗ Not quite.</strong> The answer is <strong>=RANDARRAY(4,3,1,100)</strong>. RANDARRAY takes (rows, cols, min, max) and spills the entire array automatically — no need to copy the formula.'
+    },
+    q2: {
+      ok:  '<strong>✓ All matched!</strong> Full syntax: <code>=XLOOKUP(lookup_value, lookup_array, return_array, [if_not_found], [match_mode], [search_mode])</code>. Each argument has a distinct role in controlling what is searched and what is returned.',
+      err: '<strong>✗ Incorrect pair.</strong> Try again — review: <em>lookup_value</em> = what to find; <em>return_array</em> = what to return; <em>if_not_found</em> = fallback text; <em>match_mode</em> = exact / wildcard / approximate.'
+    },
+    q3: {
+      ok:  '<strong>✓ Correct order!</strong> Build a two-way XLOOKUP by first identifying your lookup values, then writing the outer XLOOKUP for rows, nesting the inner XLOOKUP as the return_array for columns, and finally verifying the intersection result.',
+      err: '<strong>✗ Not in the right order yet.</strong> Start by identifying the row value → write the outer XLOOKUP → nest the inner XLOOKUP as return_array → verify the result.'
+    }
+  };
+
+  /* ════════════════════════════════════════════
+     PROGRESS
+  ════════════════════════════════════════════ */
+  function updateProgress(n) {
+    var pct = Math.round((n / 3) * 100);
+    document.getElementById('prog-fill').style.width = pct + '%';
+    document.getElementById('prog-lbl').textContent  = n + ' / 3';
+    var track = document.querySelector('.progress-track');
+    track.setAttribute('aria-valuenow', n);
+  }
+
+  /* ════════════════════════════════════════════
+     MCQ — Q1
+  ════════════════════════════════════════════ */
+  function checkMCQ(btn, qid, isCorrect) {
+    if (answered[qid]) return;
+    answered[qid] = true;
+
+    var card = document.getElementById(qid);
+    var btns = card.querySelectorAll('.opt-btn');
+    btns.forEach(function(b) { b.disabled = true; });
+
+    var fb = document.getElementById(qid + '-fb');
+
+    if (isCorrect) {
+      btn.classList.add('is-correct');
+      score++;
+      fb.innerHTML   = FB[qid].ok;
+      fb.className   = 'feedback show fb-ok';
+    } else {
+      btn.classList.add('is-wrong');
+      fb.innerHTML   = FB[qid].err;
+      fb.className   = 'feedback show fb-err';
+      /* reveal correct */
+      btns.forEach(function(b) {
+        if (b.getAttribute('onclick') && b.getAttribute('onclick').indexOf('true') !== -1) {
+          b.classList.add('is-correct');
+        }
+      });
+    }
+    document.getElementById(qid + '-next').disabled = false;
+  }
+
+  /* ════════════════════════════════════════════
+     MATCH — Q2
+  ════════════════════════════════════════════ */
+  function matchClick(id) {
+    /* ignore if already correctly matched */
+    var el = document.getElementById(id);
+    if (!el || el.classList.contains('m-correct')) return;
+    if (answered.q2) return;
+
+    var isLeft = id.startsWith('ml');
+
+    if (!matchSel) {
+      /* nothing selected yet — only allow left items to start */
+      if (!isLeft) return;
+      /* deselect any existing selection */
+      clearMatchSelected();
+      el.classList.add('selected');
+      matchSel = id;
+    } else {
+      /* something already selected */
+      if (isLeft) {
+        /* re-select a different left item */
+        clearMatchSelected();
+        el.classList.add('selected');
+        matchSel = id;
+        return;
+      }
+
+      /* right item clicked — evaluate pair */
+      var leftEl  = document.getElementById(matchSel);
+      var correct = PAIRS[matchSel] === id;
+
+      clearMatchSelected();
+
+      if (correct) {
+        leftEl.classList.add('m-correct');
+        el.classList.add('m-correct');
+        leftEl.removeAttribute('tabindex');
+        el.removeAttribute('tabindex');
+        matchCount++;
+
+        if (matchCount === 4) {
+          /* all pairs found */
+          score++;
+          answered.q2 = true;
+          showFB('q2-fb', FB.q2.ok, 'fb-ok');
+          document.getElementById('q2-next').disabled = false;
+          updateProgress(countAnswered());
+        }
+      } else {
+        leftEl.classList.add('m-wrong');
+        el.classList.add('m-wrong');
+        showFB('q2-fb', FB.q2.err, 'fb-err');
+        setTimeout(function() {
+          leftEl.classList.remove('m-wrong');
+          el.classList.remove('m-wrong');
+          document.getElementById('q2-fb').classList.remove('show');
+        }, 1000);
+      }
+      matchSel = null;
+    }
+  }
+
+  function clearMatchSelected() {
+    document.querySelectorAll('.m-item.selected').forEach(function(el) {
+      el.classList.remove('selected');
+    });
+  }
+
+  /* ════════════════════════════════════════════
+     ARRANGE — Q3
+  ════════════════════════════════════════════ */
+  var dragSrc = null;
+
+  (function initDrag() {
+    var list = document.getElementById('arr-list');
+    updateStepNums();
+
+    list.querySelectorAll('.arr-item').forEach(function(item) {
+      item.addEventListener('dragstart', function() {
+        dragSrc = item;
+        setTimeout(function() { item.classList.add('dragging'); }, 0);
+      });
+      item.addEventListener('dragend', function() {
+        item.classList.remove('dragging');
+        list.querySelectorAll('.arr-item').forEach(function(i) {
+          i.classList.remove('drag-over');
+        });
+        updateStepNums();
+      });
+      item.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        if (item !== dragSrc) item.classList.add('drag-over');
+      });
+      item.addEventListener('dragleave', function() {
+        item.classList.remove('drag-over');
+      });
+      item.addEventListener('drop', function(e) {
+        e.preventDefault();
+        item.classList.remove('drag-over');
+        if (dragSrc && dragSrc !== item) {
+          var items   = Array.from(list.children);
+          var srcIdx  = items.indexOf(dragSrc);
+          var tgtIdx  = items.indexOf(item);
+          if (srcIdx < tgtIdx) list.insertBefore(dragSrc, item.nextSibling);
+          else                  list.insertBefore(dragSrc, item);
+          updateStepNums();
+        }
+      });
+    });
+  })();
+
+  function updateStepNums() {
+    var list = document.getElementById('arr-list');
+    list.querySelectorAll('.step-n').forEach(function(el, i) {
+      el.textContent = (i + 1) + '.';
+    });
+  }
+
+  function checkArrange() {
+    if (arrChecked) return;
+    var list  = document.getElementById('arr-list');
+    var items = Array.from(list.querySelectorAll('.arr-item'));
+    var order = items.map(function(i) { return parseInt(i.dataset.order); });
+    var ok    = JSON.stringify(order) === JSON.stringify(ARR_CORRECT);
+
+    items.forEach(function(item, idx) {
+      item.classList.remove('arr-ok', 'arr-bad');
+      item.classList.add(order[idx] === ARR_CORRECT[idx] ? 'arr-ok' : 'arr-bad');
+    });
+
+    if (ok) {
+      arrChecked      = true;
+      answered.q3     = true;
+      score++;
+      showFB('q3-fb', FB.q3.ok, 'fb-ok');
+      document.getElementById('q3-next').disabled = false;
+      updateProgress(countAnswered());
+    } else {
+      showFB('q3-fb', FB.q3.err, 'fb-err');
+    }
+  }
+
+  /* ════════════════════════════════════════════
+     HELPERS
+  ════════════════════════════════════════════ */
+  function showFB(id, html, cls) {
+    var el     = document.getElementById(id);
+    el.innerHTML = html;
+    el.className = 'feedback show ' + cls;
+  }
+
+  function countAnswered() {
+    var c = 0;
+    if (answered.q1) c++;
+    if (answered.q2) c++;
+    if (answered.q3) c++;
+    return c;
+  }
+
+  /* ════════════════════════════════════════════
+     NAVIGATION
+  ════════════════════════════════════════════ */
+  function goNext(current) {
+    answered['q' + current] = true;   /* ensure marked */
+    updateProgress(countAnswered());
+
+    document.getElementById('q' + current).classList.remove('active');
+    var next = current + 1;
+    if (next <= 3) {
+      document.getElementById('q' + next).classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  /* ════════════════════════════════════════════
+     RESULTS
+  ════════════════════════════════════════════ */
+  function showResults() {
+    document.getElementById('quiz-area').querySelectorAll('.q-card').forEach(function(c) {
+      c.classList.remove('active');
+    });
+    document.getElementById('prog-fill').style.width = '100%';
+    document.getElementById('prog-lbl').textContent  = '3 / 3';
+
+    var pct  = Math.round((score / 3) * 100);
+    var ring = document.getElementById('ring');
+    ring.style.setProperty('--ring-pct', pct + '%');
+    document.getElementById('ring-num').textContent = score + '/3';
+
+    var title, body;
+    if (score === 3) {
+      title = '🏆 Perfect Score!';
+      body  = 'Outstanding! You\'ve mastered RANDARRAY, XLOOKUP arguments, and two-way lookup construction.';
+    } else if (score === 2) {
+      title = '🎯 Great Work!';
+      body  = 'Solid understanding. Review the question you missed to round out your Excel advanced lookup skills.';
+    } else if (score === 1) {
+      title = '📈 Good Start';
+      body  = 'You got one correct. Revisit XLOOKUP syntax and how RANDARRAY fills arrays — then try again!';
+    } else {
+      title = '📚 Keep Practicing';
+      body  = 'No worries — these are advanced topics. Review the module content and retake the quiz when ready.';
+    }
+
+    document.getElementById('res-title').textContent = title;
+    document.getElementById('res-body').textContent  = body;
+
+    var rs = document.getElementById('results');
+    rs.style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /* ════════════════════════════════════════════
+     RESTART
+  ════════════════════════════════════════════ */
+  function restartQuiz() {
+    window.location.reload();
+  }
+</script>
+</body>
+</html>
